@@ -2,8 +2,8 @@
 const express = require('express')
 const cors = require("cors")
 
-// const accountSid = process.env.SID
-// const authToken = process.env.TOKEN
+const accountSid = process.env.SID
+const authToken = process.env.TOKEN
 
 const client = require('twilio')(accountSid, authToken);
 
