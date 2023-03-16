@@ -70,7 +70,7 @@ function ListNumber() {
                 </FormGroup>
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
             </Form>
-            {/* <Link to='/'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify Single Number</p></Link> */}
+            <Link to='/'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify Single Number</p></Link>
         </CardBody>
     </Card>
 

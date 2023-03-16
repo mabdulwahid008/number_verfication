@@ -3,8 +3,8 @@ const express = require('express')
 const cors = require("cors")
 require('dotenv').config()
 
-const accountSid = process.env.SID || 'AC58e5cada1950ed6a0321d5b79110ff25'
-const authToken = process.env.AUTH_TOKEN || '3254cd93ff0a8a57d5a4172a7f00fe62'
+const accountSid = process.env.SID 
+const authToken = process.env.AUTH_TOKEN 
 
 const client = require('twilio')(accountSid, authToken);
 
