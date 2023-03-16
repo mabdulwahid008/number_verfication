@@ -1,6 +1,7 @@
 
 const express = require('express')
 const cors = require("cors")
+const fs = require('fs')
 require('dotenv').config()
 
 const accountSid = process.env.SID 
@@ -25,6 +26,19 @@ app.post('/verifynumber', function (req, res) {
           res.status(200).json({num})
           })
       .catch(error => console.log(error.message));
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({message: 'Server Error'})
+  }
+})
+
+app.post('/insert-number', async(req, res)=> {
+  const { number } = req.body
+  try {
+    fs.writeFile('numbers.txt', number, (err)=>{
+      console.log(err);
+    })
+    return res.status(200).json({message: 'Number added'})
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({message: 'Server Error'})
