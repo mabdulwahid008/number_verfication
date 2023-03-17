@@ -3,18 +3,21 @@ import { Link } from 'react-router-dom'
 import { Button, Card, CardBody, CardHeader, CardTitle, Form, FormGroup, Input } from 'reactstrap'
 import { BsArrowLeft, BsXLg, BsFiles } from "react-icons/bs";
 import { BiLogOutCircle } from "react-icons/bi";
+import img from '../assets/img/loading.gif'
 
 function ListNumber() {
     const [list, setList] = useState('')
     const [loading, setLoading] = useState(false)   
     const [Validlist, setValidList] = useState(null)
     const [numbersStored, setNumbersStored] = useState(null)
+    const [error, setError] = useState(null)
     
     // for storing into file
     const [number, setNumber] = useState(null)
     const [response, setResponse] = useState(null)
     const [showBox, setShowBox] = useState(false)
-    const [loadingforInsert, setLoadingforInsert] = useState(false)   
+    const [loadingforInsert, setLoadingforInsert] = useState(false)  
+    const [count, setCount] = useState(0) 
 
     const insertNumber = async(e) => {
         e.preventDefault()
@@ -96,6 +99,7 @@ function ListNumber() {
             })
             
             const res = await response.json()
+ 
             if(response.status === 200){
                 if(res.num.carrier.type === "landline"){
                     console.log();
@@ -107,12 +111,19 @@ function ListNumber() {
                 else    
                     validPhoneNumbers.push(phoneNumbersArray[i])
                     setValidList(validPhoneNumbers)
+                    setCount(count + 1)
+            }
+            else{
+                
+                setError(res.message)
+                break;
             }
         }
 
         setLoading(false)
     }
 
+  
     useEffect(() => {
         fetchNumbersFromFile()
     }, [loadingforInsert])
@@ -130,13 +141,16 @@ function ListNumber() {
             <Form onSubmit={onSubmit}>
                 <FormGroup style={{display:'flex', flexDirection:'column'}}>
                     <label>Enter List</label>
-                    <textarea name="list" id="" onChange={(e)=>{setList(e.target.value)}}></textarea>
+                    <textarea name="list" id="" required onChange={(e)=>{setList(e.target.value)}}></textarea>
                 </FormGroup>
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
             </Form>
+            {error && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: 'Red'}}>{error}</p>}
             {!showBox && <div onClick={()=> setShowBox(true)} style={{textAlign:'center',padding: 5, cursor:'pointer', color:'black', textDecoration:'underline'}}>Store Number</div>}
         </CardBody>
     </Card>
+
+    {loading && <img src={img} alt="loading" style={{width: '30px', height:'30px', marginTop: '20px'}}/>}
 
     {Validlist && Validlist.length > 0 && !loading && <Card className='card' style={{marginTop: 20,paddingBottom: 20}}>
         <CardHeader style={{justifyContent:'space-between'}}>

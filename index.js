@@ -2,6 +2,7 @@
 const express = require('express')
 const cors = require("cors")
 const fs = require('fs')
+const path = require('path')
 require('dotenv').config()
 
 const accountSid = process.env.SID 
@@ -14,21 +15,25 @@ const app = express();
 app.use(cors())
 app.use(express.json())
 
-app.use(express.static("client/build"))
+app.use(express.static(path.join(__dirname, "client/build")))
 
 app.post('/verifynumber', function (req, res) {
   const { number } = req.body
   try {    
 
     client.lookups.v1.phoneNumbers(number)
-      .fetch({type: ['carrier'], addOns:['twilio_sms']})
+      .fetch({type: ['carrier']})
       .then(num => {
-          res.status(200).json({num})
+          return  res.status(200).json({num})
           })
-      .catch(error => console.log(error.message));
+      .catch(error => {
+        if(error)
+          return res.status(500).json({message: 'API gets blocked'})
+        }
+    );
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json({message: 'Server Error'})
+    return res.status(500).json({message: 'API gets blocked'})
   }
 })
 
@@ -63,6 +68,11 @@ app.get('/get-numbers', async(req, res) => {
     return res.status(500).json({message: 'Server Error'})
   }
 })
+
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", 'index.html'));
+});
 
 app.listen(5000, ()=>{
   console.log("App is listening on port 5000");

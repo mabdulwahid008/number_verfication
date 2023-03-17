@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, CardBody, CardHeader, CardTitle, Form, FormGroup, Input } from 'reactstrap'
 import { BiLogOutCircle } from "react-icons/bi";
+import img from '../assets/img/loading.gif'
 
 function SingleNumber() {
     const [number, setNumber] = useState(0)
@@ -67,19 +68,18 @@ function SingleNumber() {
 
         if(response.status === 200){
             if(res.num.carrier.type === "landline"){
-                setResponse("Invalid")
+                setResponse("The phone number is invalid")
             }
             else if(res.num.carrier.mobile_network_code === null)
-                setResponse("Invalid")
+                setResponse("The phone number is invalid")
             else if(res.num.carrier.name === "AT&T Wireless" && res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
-                setResponse("Invalid")
+                setResponse("The phone number is invalid")
             else    
-                setResponse("Valid")
+                setResponse("The phone number is valid")
             setNumberInfo(res.num.carrier)
-            console.log(res);
         }
         else{
-            setErrorMessage(res.message)
+            setResponse(res.message)
             setError(true)
         }
         setLoading(false)
@@ -98,16 +98,18 @@ function SingleNumber() {
             <Form onSubmit={onSubmit}>
                 <FormGroup>
                     <label>Enter Number</label>
-                    <Input type="text" onChange={(e)=> {setNumber(e.target.value); setError(false); setResponse(null)}}/>
+                    <Input type="text" required onChange={(e)=> {setNumber(e.target.value); setError(false); setResponse(null)}}/>
                 </FormGroup>
                 {error && <p style={{color: 'red'}}>{errorMessage}</p>}
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
-                {response && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: `${response === "Valid"? 'Green': 'Red'}`}}>The phone number is {response}</p>}
+                {response && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: `${response === "The phone number is valid"? 'Green': 'Red'}`}}>{response}</p>}
             </Form>
             {localStorage.getItem('admin') && <Link to='/verify-list'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify List</p></Link>}
         </CardBody>
     </Card>
     
+    {loading && <img src={img} alt="loading" style={{width: '30px', height:'30px', marginTop: '20px'}}/>}
+
    {numberInfo && response && <Card className='card' style={{marginTop: 20}}>
         <CardHeader>
             <CardTitle tag="h4">Number Info</CardTitle>
