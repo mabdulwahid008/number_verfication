@@ -1,7 +1,7 @@
 .layout{
     /* width: 100vw; */
     min-height: 100vh;
-    max-height: 500vh;
+    max-height: auto;
     padding: 100px 0px 100px 0px;
     display: flex;
     justify-content: center;
@@ -28,4 +28,23 @@ textarea{
 }
 p{
     line-height: 1;
+}
+
+.card-header{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+svg{
+    color: #777;
+    font-size: 35px;
+    padding: 5px;
+    cursor: pointer;
+}
+.logout{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    transform: rotate(90deg);
 }

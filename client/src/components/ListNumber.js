@@ -1,11 +1,65 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, CardBody, CardHeader, CardTitle, Form, FormGroup, Input } from 'reactstrap'
+import { BsArrowLeft, BsXLg, BsFiles } from "react-icons/bs";
+import { BiLogOutCircle } from "react-icons/bi";
 
 function ListNumber() {
-    const [loading, setLoading] = useState(false)
     const [list, setList] = useState('')
+    const [loading, setLoading] = useState(false)   
     const [Validlist, setValidList] = useState(null)
+    const [numbersStored, setNumbersStored] = useState(null)
+    
+    // for storing into file
+    const [number, setNumber] = useState(null)
+    const [response, setResponse] = useState(null)
+    const [showBox, setShowBox] = useState(false)
+    const [loadingforInsert, setLoadingforInsert] = useState(false)   
+
+    const insertNumber = async(e) => {
+        e.preventDefault()
+        setLoadingforInsert(true)
+        let num = number.replace(/[().\s-]/g, "");
+
+        if(!num.startsWith('+1')){
+            let pre = '+1'
+            num = pre.concat(num)
+        }
+        if(num.length !== 12){
+            setResponse('Number is invalid')
+            setLoadingforInsert(false)
+            return;
+        }
+
+        const response = await fetch('/insert-number',{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'Application/json'
+            },
+            body: JSON.stringify({number: num})
+        })
+        const res = await response.json()
+        if(response.status)
+            setResponse(res.message)
+        else
+            setResponse(res.message)
+        setLoadingforInsert(false)
+    }
+
+    const fetchNumbersFromFile = async() => {
+        const response = await fetch('get-numbers',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'Application/json'
+            }
+        })
+        const res = await response.json()
+        if(response.status === 200)
+            setNumbersStored(res)
+        else 
+            console.log(res.message);
+    }
+    
     
     const onSubmit = async(e) => {
         e.preventDefault()
@@ -21,6 +75,12 @@ function ListNumber() {
                 num = pre.concat(num)
             }
             if(num.length !== 12){
+                continue;
+            }
+
+            const check = numbersStored.some((number)=> number === num)
+            if(check){
+                console.log(number);
                 continue;
             }
 
@@ -46,20 +106,24 @@ function ListNumber() {
                     console.log();
                 else    
                     validPhoneNumbers.push(phoneNumbersArray[i])
+                    setValidList(validPhoneNumbers)
             }
         }
-        setValidList(validPhoneNumbers)
 
         setLoading(false)
     }
+
     useEffect(() => {
-      console.log(Validlist);
-    }, [Validlist])
+        fetchNumbersFromFile()
+    }, [loadingforInsert])
+
     
   return (
     <div className='layout'>
+    <BiLogOutCircle className='logout' onClick={()=>{localStorage.removeItem('token'); localStorage.removeItem('admin'); window.location.reload(true)}}/>    
     <Card className='card'>
         <CardHeader>
+            <Link to='/'><BsArrowLeft /></Link>
             <CardTitle tag="h4">Verfiy List in One Go</CardTitle>
         </CardHeader>
         <CardBody>
@@ -70,18 +134,36 @@ function ListNumber() {
                 </FormGroup>
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
             </Form>
-            <Link to='/'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify Single Number</p></Link>
+            {!showBox && <div onClick={()=> setShowBox(true)} style={{textAlign:'center',padding: 5, cursor:'pointer', color:'black', textDecoration:'underline'}}>Store Number</div>}
         </CardBody>
     </Card>
 
-    {Validlist && Validlist.length !== 0 && !loading && <Card className='card' style={{marginTop: 20}}>
-        <CardHeader>
+    {Validlist && Validlist.length > 0 && !loading && <Card className='card' style={{marginTop: 20,paddingBottom: 20}}>
+        <CardHeader style={{justifyContent:'space-between'}}>
             <CardTitle tag="h4">Valid List</CardTitle>
+            <BsFiles onClick={()=> navigator.clipboard.writeText(Validlist)}/>
         </CardHeader>
-        <CardBody>
+        <CardBody style={{overflow: 'auto', minHeight: 20}}>
             {Validlist.map((num, index)=>{
                 return <p style={{lineHeight: 0.5}} key={index}>{num}</p>
             })}
+        </CardBody>
+    </Card>}
+
+    {showBox && <Card className='card' style={{marginTop: 20}}>
+        <CardHeader style={{justifyContent: 'space-between'}}>
+            <CardTitle tag="h4">Save Number</CardTitle>
+            <BsXLg onClick={()=> setShowBox(false)}/>
+        </CardHeader>
+        <CardBody>
+            <Form onSubmit={insertNumber}>
+                <FormGroup>
+                    <label>Enter Number</label>
+                    <Input type='text' onChange={(e)=> {setNumber(e.target.value); setResponse(null)}} required />
+                </FormGroup>
+                <Button disabled={loadingforInsert? true : false} className='button'>Insert</Button>
+                {response && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: `${response === "Number added"? 'Green': 'Red'}`}}>{response}</p>}
+            </Form>
         </CardBody>
     </Card>}
 </div>

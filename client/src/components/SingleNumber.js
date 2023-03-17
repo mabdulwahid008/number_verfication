@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, CardBody, CardHeader, CardTitle, Form, FormGroup, Input } from 'reactstrap'
+import { BiLogOutCircle } from "react-icons/bi";
 
 function SingleNumber() {
     const [number, setNumber] = useState(0)
@@ -9,6 +10,21 @@ function SingleNumber() {
     const [errorMessage, setErrorMessage] = useState('')
     const [response, setResponse] = useState(null)
     const [numberInfo, setNumberInfo] = useState(null)
+    const [numbersStored, setNumbersStored] = useState(null)
+
+    const fetchNumbersFromFile = async() => {
+        const response = await fetch('get-numbers',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'Application/json'
+            }
+        })
+        const res = await response.json()
+        if(response.status === 200)
+            setNumbersStored(res)
+        else 
+            console.log(res.message);
+    }
 
     const onSubmit = async(e) => {
         e.preventDefault()
@@ -23,6 +39,14 @@ function SingleNumber() {
         }
         if(num.length !== 12){
             setErrorMessage('Invalid phone number')
+            setError(true)
+            setLoading(false)
+            return;
+        }
+
+        const check = numbersStored.some((number)=> number === num)
+        if(check){
+            setResponse('Invalid')
             setError(true)
             setLoading(false)
             return;
@@ -60,8 +84,12 @@ function SingleNumber() {
         }
         setLoading(false)
     }
+    useEffect(() => {
+        fetchNumbersFromFile()
+    }, [])
   return (
     <div className='layout'>
+    <BiLogOutCircle className='logout' onClick={()=>{localStorage.removeItem('token'); localStorage.removeItem('admin'); window.location.reload(true)}}/>
     <Card className='card'>
         <CardHeader>
             <CardTitle tag="h4">Number Verification</CardTitle>
@@ -76,7 +104,7 @@ function SingleNumber() {
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
                 {response && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: `${response === "Valid"? 'Green': 'Red'}`}}>The phone number is {response}</p>}
             </Form>
-            <Link to='/verify-list'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify List</p></Link>
+            {localStorage.getItem('admin') && <Link to='/verify-list'><p style={{textAlign:'center', color:'black', textDecoration:'underline'}}>Verify List</p></Link>}
         </CardBody>
     </Card>
     

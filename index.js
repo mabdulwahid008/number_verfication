@@ -21,7 +21,7 @@ app.post('/verifynumber', function (req, res) {
   try {    
 
     client.lookups.v1.phoneNumbers(number)
-      .fetch({type: ['carrier']})
+      .fetch({type: ['carrier'], addOns:['twilio_sms']})
       .then(num => {
           res.status(200).json({num})
           })
@@ -35,10 +35,29 @@ app.post('/verifynumber', function (req, res) {
 app.post('/insert-number', async(req, res)=> {
   const { number } = req.body
   try {
-    fs.writeFile('numbers.txt', number, (err)=>{
-      console.log(err);
+    const data = fs.readFileSync('numbers.txt', 'utf8');
+    let numbers = data.split("\n");
+    const check = numbers.some((num)=> num === number)
+    if(check)
+      return res.status(422).json({message: 'Number already saved'})
+      
+    fs.appendFile('numbers.txt', number + '\n', (err)=>{
+      if(err)
+        console.log(err);
     })
     return res.status(200).json({message: 'Number added'})
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({message: 'Server Error'})
+  }
+})
+
+app.get('/get-numbers', async(req, res) => {
+  try {
+    const data = fs.readFileSync('numbers.txt', 'utf8');
+    let numbers = data.split("\n");
+    
+    return res.status(200).json(numbers)
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({message: 'Server Error'})
