@@ -8,7 +8,7 @@ import img from '../assets/img/loading.gif'
 function ListNumber() {
     const [list, setList] = useState('')
     const [loading, setLoading] = useState(false)   
-    const [Validlist, setValidList] = useState(null)
+    const [Validlist, setValidList] = useState([])
     const [numbersStored, setNumbersStored] = useState(null)
     const [error, setError] = useState(null)
     
@@ -67,6 +67,7 @@ function ListNumber() {
     const onSubmit = async(e) => {
         e.preventDefault()
         setLoading(true)
+        setValidList([])
         let phoneNumbersArray = list.split("\n");
 
         let validPhoneNumbers = []
@@ -109,8 +110,7 @@ function ListNumber() {
                 else if(res.num.carrier.name === "AT&T Wireless" && res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
                     console.log();
                 else    
-                    validPhoneNumbers.push(phoneNumbersArray[i])
-                    setValidList(validPhoneNumbers)
+                    setValidList(prevValidList => [...prevValidList, phoneNumbersArray[i]]);
                     setCount(count + 1)
             }
             else{
@@ -122,6 +122,8 @@ function ListNumber() {
 
         setLoading(false)
     }
+useEffect(()=>{
+}, [Validlist])
 
   
     useEffect(() => {
@@ -152,14 +154,17 @@ function ListNumber() {
 
     {loading && <img src={img} alt="loading" style={{width: '30px', height:'30px', marginTop: '20px'}}/>}
 
-    {Validlist && Validlist.length > 0 && !loading && <Card className='card' style={{marginTop: 20,paddingBottom: 20}}>
+    {Validlist && Validlist.length > 0 && <Card className='card' style={{marginTop: 20,paddingBottom: 20}}>
         <CardHeader style={{justifyContent:'space-between'}}>
             <CardTitle tag="h4">Valid List</CardTitle>
             <BsFiles onClick={()=> navigator.clipboard.writeText(Validlist)}/>
         </CardHeader>
         <CardBody style={{overflow: 'auto', minHeight: 20}}>
             {Validlist.map((num, index)=>{
-                return <p style={{lineHeight: 0.5}} key={index}>{num}</p>
+                return <p style={{display:'flex', gap:50, marginBottom:-8}} key={index} >
+                    <p style={{width:'15px'}}>{index+1}.</p>
+                    <p style={{textAlign: 'right', width:'100px'}}>{num}</p>
+                    </p>
             })}
         </CardBody>
     </Card>}
