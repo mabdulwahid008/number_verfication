@@ -28,7 +28,7 @@ app.post('/verifynumber', function (req, res) {
           })
       .catch(error => {
         if(error)
-          return res.status(500).json({message: 'API gets blocked'})
+          return res.status(500).json({message: 'Invalid Number'})
         }
     );
   } catch (error) {
