@@ -107,8 +107,8 @@ function ListNumber() {
                 }
                 else if(res.num.carrier.mobile_network_code === null)
                     console.log();
-                // else if(res.num.carrier.name === "AT&T Wireless" && res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
-                else if(res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
+                else if(res.num.carrier.name === "AT&T Wireless" && res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
+                // else if(res.num.carrier.mobile_country_code == "311" && res.num.carrier.mobile_network_code == "180" )
                     console.log();
                 else    
                     setValidList(prevValidList => [...prevValidList, phoneNumbersArray[i]]);
