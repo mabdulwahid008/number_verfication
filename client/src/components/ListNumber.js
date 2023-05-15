@@ -10,7 +10,6 @@ function ListNumber() {
     const [loading, setLoading] = useState(false)   
     const [Validlist, setValidList] = useState([])
     const [numbersStored, setNumbersStored] = useState(null)
-    const [error, setError] = useState(null)
     
     // for storing into file
     const [number, setNumber] = useState(null)
@@ -69,8 +68,7 @@ function ListNumber() {
         setLoading(true)
         setValidList([])
         let phoneNumbersArray = list.split("\n");
-
-        let validPhoneNumbers = []
+        
         for (let i = 0; i < phoneNumbersArray.length; i++) {
             let num = phoneNumbersArray[i].replace(/[().\s-]/g, "");
 
@@ -84,7 +82,6 @@ function ListNumber() {
 
             const check = numbersStored.some((number)=> number === num)
             if(check){
-                console.log(number);
                 continue;
             }
 
@@ -115,9 +112,7 @@ function ListNumber() {
                     setCount(count + 1)
             }
             else{
-                
-                setError(res.message)
-                break;
+                continue;
             }
         }
 
@@ -148,7 +143,6 @@ useEffect(()=>{
                 </FormGroup>
                 <Button disabled={loading? true : false} className='button'>Verify</Button>
             </Form>
-            {error && <p style={{textAlign:'center', fontWeight: 500, padding:'10px 0px 0px', color: 'Red'}}>{error}</p>}
             {!showBox && <div onClick={()=> setShowBox(true)} style={{textAlign:'center',padding: 5, cursor:'pointer', color:'black', textDecoration:'underline'}}>Store Number</div>}
         </CardBody>
     </Card>
@@ -163,7 +157,7 @@ useEffect(()=>{
         <CardBody style={{overflow: 'auto', minHeight: 20}}>
             {Validlist.map((num, index)=>{
                 return <p style={{display:'flex', gap:50, marginBottom:-8}} key={index} >
-                    <p style={{width:'15px'}}>{index+1}.</p>
+                    <p style={{width:'20px'}}>{index+1}.</p>
                     <p style={{textAlign: 'right', width:'100px'}}>{num}</p>
                     </p>
             })}
